@@ -1,0 +1,100 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.4.1
+  creationTimestamp: null
+  name: nettopologies.qkdsim.s276624.qkdsim.dev
+spec:
+  group: qkdsim.s276624.qkdsim.dev
+  names:
+    kind: NetTopology
+    listKind: NetTopologyList
+    plural: nettopologies
+    singular: nettopology
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .spec.protocol
+      name: Protocol
+      type: string
+    - jsonPath: .status.status
+      name: Status
+      type: string
+    name: v1
+    schema:
+      openAPIV3Schema:
+        description: QKDSimulator is the Schema for the qkdsimulators API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: QKDSimulatorSpec defines the desired state of QKDSimulator
+            properties:
+              adjacency:
+                items:
+                  items:
+                    description: Add node struct type for Python Networkx Topology
+                      import
+                    properties:
+                      id:
+                        type: string
+                    required:
+                    - id
+                    type: object
+                  type: array
+                type: array
+              nodes:
+                description: "\t\tFor the Barebones version of the simulator we will
+                  just create a controller that will spawn 4 pods being this pods
+                  Alice, Bob, Eve/Clear Channel and an instace of RabbitMq that will
+                  have to take care of \t\tthe communications among them since we
+                  want to replace the previous Rest API way of exchanging information.
+                  Moreover we won't think about different methods of authenticating
+                  classical messages exchanged yet. \n \t\tThis below is a mix of
+                  config parameters for Both Eve Bob and Alice"
+                items:
+                  description: Add node struct type for Python Networkx Topology import
+                  properties:
+                    id:
+                      type: string
+                  required:
+                  - id
+                  type: object
+                type: array
+            required:
+            - adjacency
+            - nodes
+            type: object
+          status:
+            description: QKDSimulatorStatus defines the observed state of QKDSimulator
+            properties:
+              status:
+                description: 'INSERT ADDITIONAL STATUS FIELD - define observed state
+                  of cluster Important: Run "make" to regenerate code after modifying
+                  this file'
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

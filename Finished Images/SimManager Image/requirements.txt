@@ -1,0 +1,7 @@
+jupyter
+networkx
+matplotlib
+flask
+pika
+pyspx
+pyyaml

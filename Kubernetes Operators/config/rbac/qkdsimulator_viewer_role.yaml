@@ -1,0 +1,20 @@
+# permissions for end users to view qkdsimulators.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: qkdsimulator-viewer-role
+rules:
+- apiGroups:
+  - qkdsim.s276624.qkdsim.dev
+  resources:
+  - qkdsimulators
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - qkdsim.s276624.qkdsim.dev
+  resources:
+  - qkdsimulators/status
+  verbs:
+  - get

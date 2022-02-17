@@ -1,0 +1,6 @@
+hvac==0.10.4
+pyOpenSSL==19.1.0
+pyspx
+qiskit
+cryptography
+pika

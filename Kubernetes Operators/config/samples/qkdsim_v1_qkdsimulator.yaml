@@ -1,0 +1,7 @@
+apiVersion: qkdsim.s276624.qkdsim.dev/v1
+kind: QKDSimulator
+metadata:
+  name: qkdsimulator-sample
+spec:
+  # Add fields here
+  foo: bar

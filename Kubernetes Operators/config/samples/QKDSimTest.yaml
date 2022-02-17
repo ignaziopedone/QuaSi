@@ -1,0 +1,10 @@
+apiVersion: qkdsim.s276624.qkdsim.dev/v1
+kind: QKDSimulator
+metadata:
+  name: qkdsimulator-sample
+spec:
+  rabbit-host: rabbittomq
+  rabbit-port: 5673
+  manager-host: sim-manager
+  manager-rest-port: 6969
+  manager-gui-port: 6997

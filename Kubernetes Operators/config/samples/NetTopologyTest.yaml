@@ -1,0 +1,22 @@
+apiVersion: qkdsim.s276624.qkdsim.dev/v1
+kind: NetTopology
+metadata: 
+  name: nettopology-sample
+spec:
+  adjacency:
+    - - id: b
+      - id: c
+      - id: d
+    - - id: a
+      - id: d
+    - - id: a
+      - id: d
+    - - id: a
+      - id: b
+      - id: c
+  nodes:
+    - id: a
+    - id: b
+    - id: c
+    - id: d
+

@@ -1,0 +1,24 @@
+# permissions for end users to edit qkdsimulators.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: qkdsimulator-editor-role
+rules:
+- apiGroups:
+  - qkdsim.s276624.qkdsim.dev
+  resources:
+  - qkdsimulators
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - qkdsim.s276624.qkdsim.dev
+  resources:
+  - qkdsimulators/status
+  verbs:
+  - get

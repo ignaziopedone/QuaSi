@@ -41,31 +41,6 @@ func (r *QKDSimulatorReconciler) desiredConfigMap(qkds qkdsimv1.QKDSimulator, wh
 	return cmap, nil
 }
 
-func (r *QKDSimulatorReconciler) desiredRabbitMQPVC(qkdsim qkdsimv1.QKDSimulator, name string, port int32) (corev1.PersistentVolumeClaim, error) {
-	labels := make(map[string]string)
-
-	labels["app"] = name
-
-	stset := corev1.PersistentVolumeClaim{
-		TypeMeta: metav1.TypeMeta{APIVersion: appsv1.SchemeGroupVersion.String(), Kind: "StatefulSet"},
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      name,
-			Namespace: "default",
-		},
-		Spec: corev1.PersistentVolumeClaimSpec{
-			Resources: corev1.ResourceRequirements{
-				Requests: corev1.ResourceList{},
-			},
-		},
-	}
-
-	if err := ctrl.SetControllerReference(&qkdsim, &stset, r.Scheme); err != nil {
-		return stset, err
-	}
-
-	return stset, nil
-}
-
 func (r *QKDSimulatorReconciler) desiredRabbitMQ(qkdsim qkdsimv1.QKDSimulator, name string, port int32) (appsv1.StatefulSet, error) {
 	labels := make(map[string]string)
 
@@ -88,18 +63,35 @@ func (r *QKDSimulatorReconciler) desiredRabbitMQ(qkdsim qkdsimv1.QKDSimulator, n
 					Labels: labels,
 				},
 				Spec: corev1.PodSpec{
-					Volumes: []corev1.Volume{
-						corev1.Volume{
-							Name: name,
-							VolumeSource: corev1.VolumeSource{
-								PersistentVolumeClaim: &corev1.PersistentVolumeClaimVolumeSource{
-									ClaimName: name,
+					Containers: []corev1.Container{
+						corev1.Container{
+							Name:  name,
+							Image: "rabbitmq:3.8.3-management",
+							Ports: []corev1.ContainerPort{
+								corev1.ContainerPort{ContainerPort: 15672, Name: "http", Protocol: corev1.ProtocolTCP},
+								corev1.ContainerPort{ContainerPort: 5672, Name: "amqp", Protocol: corev1.ProtocolTCP},
+							},
+							LivenessProbe: &corev1.Probe{
+								Handler: corev1.Handler{
+									Exec: &corev1.ExecAction{
+										Command: []string{"rabbitmq-diagnostics", "ping"},
+									},
 								},
+								InitialDelaySeconds: 10,
+								PeriodSeconds:       30,
+								TimeoutSeconds:      15,
+							},
+							ReadinessProbe: &corev1.Probe{
+								Handler: corev1.Handler{
+									Exec: &corev1.ExecAction{
+										Command: []string{"rabbitmq-diagnostics", "check_port_connectivity"},
+									},
+								},
+								InitialDelaySeconds: 10,
+								TimeoutSeconds:      15,
+								PeriodSeconds:       30,
 							},
 						},
-					},
-					Containers: []corev1.Container{
-						corev1.Container{Name: name, VolumeMounts: []corev1.VolumeMount{corev1.VolumeMount{MountPath: "/var/lib/rabbitmq", Name: name}}, Image: "rabbitmq:3.8.3-management", Ports: []corev1.ContainerPort{corev1.ContainerPort{ContainerPort: 15672, Name: "http", Protocol: corev1.ProtocolTCP}, corev1.ContainerPort{ContainerPort: 5672, Name: "amqp", Protocol: corev1.ProtocolTCP}}, LivenessProbe: &corev1.Probe{Handler: corev1.Handler{Exec: &corev1.ExecAction{Command: []string{"rabbitmq-diagnostics", "ping"}}}, InitialDelaySeconds: 10, PeriodSeconds: 30, TimeoutSeconds: 15}, ReadinessProbe: &corev1.Probe{Handler: corev1.Handler{Exec: &corev1.ExecAction{Command: []string{"rabbitmq-diagnostics", "check_port_connectivity"}}}, InitialDelaySeconds: 10, TimeoutSeconds: 15, PeriodSeconds: 30}},
 					},
 				},
 			},
@@ -197,6 +189,28 @@ func (r *NetTopologyReconciler) desiredEndpointDeployment(net qkdsimv1.NetTopolo
 										},
 									},
 								},
+								corev1.EnvVar{
+									Name: "PNUM",
+									ValueFrom: &corev1.EnvVarSource{
+										ConfigMapKeyRef: &corev1.ConfigMapKeySelector{
+											LocalObjectReference: corev1.LocalObjectReference{
+												Name: "nodes-config",
+											},
+											Key: "pnum",
+										},
+									},
+								},
+								corev1.EnvVar{
+									Name: "TRNG",
+									ValueFrom: &corev1.EnvVarSource{
+										ConfigMapKeyRef: &corev1.ConfigMapKeySelector{
+											LocalObjectReference: corev1.LocalObjectReference{
+												Name: "nodes-config",
+											},
+											Key: "trng",
+										},
+									},
+								},
 							},
 						},
 					},
@@ -274,6 +288,28 @@ func (r *NetTopologyReconciler) desiredComChanDeployment(net qkdsimv1.NetTopolog
 												Name: "comchans-config",
 											},
 											Key: "rabbit.port",
+										},
+									},
+								},
+								corev1.EnvVar{
+									Name: "PNUM",
+									ValueFrom: &corev1.EnvVarSource{
+										ConfigMapKeyRef: &corev1.ConfigMapKeySelector{
+											LocalObjectReference: corev1.LocalObjectReference{
+												Name: "comchans-config",
+											},
+											Key: "pnum",
+										},
+									},
+								},
+								corev1.EnvVar{
+									Name: "TRNG",
+									ValueFrom: &corev1.EnvVarSource{
+										ConfigMapKeyRef: &corev1.ConfigMapKeySelector{
+											LocalObjectReference: corev1.LocalObjectReference{
+												Name: "comchans-config",
+											},
+											Key: "trng",
 										},
 									},
 								},
@@ -455,6 +491,30 @@ func (r *QKDSimulatorReconciler) desiredManagerIngress(qkds qkdsimv1.QKDSimulato
 								},
 								networkingv1.HTTPIngressPath{
 									Path:     "/distributeKeys",
+									PathType: &pathType,
+									Backend: networkingv1.IngressBackend{
+										Service: &networkingv1.IngressServiceBackend{
+											Name: host_name + "-service",
+											Port: networkingv1.ServiceBackendPort{
+												Number: host_port,
+											},
+										},
+									},
+								},
+								networkingv1.HTTPIngressPath{
+									Path:     "/begin",
+									PathType: &pathType,
+									Backend: networkingv1.IngressBackend{
+										Service: &networkingv1.IngressServiceBackend{
+											Name: host_name + "-service",
+											Port: networkingv1.ServiceBackendPort{
+												Number: host_port,
+											},
+										},
+									},
+								},
+								networkingv1.HTTPIngressPath{
+									Path:     "/end",
 									PathType: &pathType,
 									Backend: networkingv1.IngressBackend{
 										Service: &networkingv1.IngressServiceBackend{

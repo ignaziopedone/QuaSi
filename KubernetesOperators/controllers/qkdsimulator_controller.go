@@ -91,6 +91,8 @@ func (r *QKDSimulatorReconciler) Reconcile(ctx context.Context, req ctrl.Request
 	var nodes_data = make(map[string]string)
 	nodes_data["rabbit.host"] = qkdsimulator.Spec.RabbitMQ_Host + "-service"
 	nodes_data["rabbit.port"] = strconv.Itoa(int(qkdsimulator.Spec.RabbitMQ_Port))
+	nodes_data["trng"] = strconv.Itoa(int(qkdsimulator.Spec.Trng))
+	nodes_data["pnum"] = strconv.Itoa(int(qkdsimulator.Spec.Pnum))
 
 	nodes_conf, err := r.desiredConfigMap(qkdsimulator, "nodes", nodes_data)
 	if err != nil {
@@ -105,6 +107,8 @@ func (r *QKDSimulatorReconciler) Reconcile(ctx context.Context, req ctrl.Request
 	var comchans_data = make(map[string]string)
 	comchans_data["rabbit.host"] = qkdsimulator.Spec.RabbitMQ_Host + "-service"
 	comchans_data["rabbit.port"] = strconv.Itoa(int(qkdsimulator.Spec.RabbitMQ_Port))
+	comchans_data["trng"] = strconv.Itoa(int(qkdsimulator.Spec.Trng))
+	comchans_data["pnum"] = strconv.Itoa(int(qkdsimulator.Spec.Pnum))
 
 	comchans_conf, err := r.desiredConfigMap(qkdsimulator, "comchans", comchans_data)
 	if err != nil {

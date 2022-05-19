@@ -49,6 +49,8 @@ type QKDSimulatorSpec struct {
 	Manager_Host      string `json:"manager-host,omitempty"`
 	Manager_Rest_Port int32  `json:"manager-rest-port,omitempty"`
 	Manager_Gui_Port  int32  `json:"manager-gui-port,omitempty"`
+	Trng              int32  `json:"trng,omitempty"`
+	Pnum              int32  `json:"pnum,omitempty"`
 }
 
 // QKDSimulatorStatus defines the observed state of QKDSimulator

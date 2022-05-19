@@ -51,9 +51,15 @@ spec:
               manager-rest-port:
                 format: int32
                 type: integer
+              pnum:
+                format: int32
+                type: integer
               rabbit-host:
                 type: string
               rabbit-port:
+                format: int32
+                type: integer
+              trng:
                 format: int32
                 type: integer
             type: object

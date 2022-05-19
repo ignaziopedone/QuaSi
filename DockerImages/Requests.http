@@ -1,0 +1,36 @@
+POST qkdsim.com/getTopology HTTP/1.1
+Content-Type: application/json
+
+{"directed": false, "multigraph": false, "graph": [], "nodes": [{"id": "a"}, {"id": "b"}, {"id": "c"}, {"id": "d"}], "adjacency": [[{"id": "b"}, {"id": "c"}, {"id": "d"}], [{"id": "a"}, {"id": "d"}], [{"id": "a"}, {"id": "d"}], [{"id": "a"}, {"id": "b"}, {"id": "c"}]]}
+
+###
+
+POST HTTP://192.168.2.18:6000/getTopology HTTP/1.1
+Content-Type: application/json
+
+{"directed": false, "multigraph": false, "graph": [], "nodes": [{"id": "a"}, {"id": "b"}, {"id": "c"}, {"id": "d"}], "adjacency": [[{"id": "b"}, {"id": "c"}, {"id": "d"}], [{"id": "a"}, {"id": "d"}], [{"id": "a"}, {"id": "d"}], [{"id": "a"}, {"id": "b"}, {"id": "c"}]]}
+
+###
+
+POST qkdsim.com/distributeKeys HTTP/1.1
+
+###
+
+POST qkdsim.com/begin HTTP/1.1
+Content-Type: application/json
+
+{"SRC": "endpoint-1", "DST": "endpoint-3"}
+
+###
+
+POST qkdsim.com/end HTTP/1.1
+Content-Type: application/json
+
+{"ID": "b5bbac53-dd63-4580-8a08-6e0243f95a0a"}
+
+###
+
+POST  qkdsim.com/startKeyExchange HTTP/1.1
+Content-Type: application/json
+
+{"protocol": "bb84", "key_length": 4096, "chunk_size": 5, "chsh_threshold": -2.7, "authentication": "sphincs", "com_channel": "cc1-3", "interceptAndResend": 0, "manInTheMiddle": 0, "source": "endpoint-1", "destination": "endpoint-3", "key_number": 500}

@@ -3,8 +3,11 @@ kind: QKDSimulator
 metadata:
   name: qkdsimulator-sample
 spec:
+  # Add fields here
   rabbit-host: rabbittomq
   rabbit-port: 5673
   manager-host: sim-manager
   manager-rest-port: 6969
   manager-gui-port: 6997
+  trng: 0
+  pnum: 8
